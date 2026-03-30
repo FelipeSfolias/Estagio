@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Chamado #{{ chamado.id }} — {{ chamado.assunto }}</h1>
+<div class="grid-2">
+  <div class="card">
+    <h3>Dados</h3>
+    <p><strong>Status:</strong> {{ chamado.status }}</p>
+    <p><strong>Prioridade:</strong> {{ chamado.prioridade }}</p>
+    <p><strong>Origem:</strong> {{ chamado.origem }}</p>
+    <p><strong>Ativo ID:</strong> {{ chamado.ativo_id|default:"-" }}</p>
+    <p><strong>Abertura:</strong> {{ chamado.aberto_em }}</p>
+  </div>
+  <div class="card">
+    <h3>Ações</h3>
+    <form method="post" class="form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn">Registrar (mock)</button>
+    </form>
+    <p class="hint">UC07: alterar status/prioridade e registrar comentários.</p>
+  </div>
+</div>
+
+<h3>Histórico</h3>
+<ul class="timeline">
+  {% for h in chamado.historico %}
+    <li><strong>{{ h.autor }}</strong>: {{ h.texto }} <em>({{ h.quando }})</em></li>
+  {% empty %}
+    <li>Sem histórico.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

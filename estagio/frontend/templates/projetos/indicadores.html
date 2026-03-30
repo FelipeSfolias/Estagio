@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block extra_css %}
+
+{% endblock %}
+{% load l10n %}
+{% block title %}Projetos — Indicadores{% endblock %}
+{% block content %}
+
+<div class="kpi-grid">
+  <div class="card kpi"><div class="label">Total</div><div class="value">{{ kpis.total }}</div></div>
+  <div class="card kpi"><div class="label">Concluídos</div><div class="value">{{ kpis.concluidos }}</div></div>
+  <div class="card kpi"><div class="label">Em andamento</div><div class="value">{{ kpis.em_andamento }}</div></div>
+  <div class="card kpi"><div class="label">Não iniciados</div><div class="value">{{ kpis.nao_iniciados }}</div></div>
+</div>
+
+<div class="grid-2" style="margin-top:12px">
+  <div class="card">
+    <h3>Desempenho Concluído</h3>
+    <div style="display:flex;gap:24px;align-items:center">
+      <div style="width:220px;height:220px;border-radius:50%;position:relative;
+                  background: conic-gradient(
+                    {% for s in concl_segments %}
+                      {{ s.color }} {{ s.start|unlocalize }}% {{ s.end|unlocalize }}%{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  );">
+        <div style="position:absolute;inset:36px;background:var(--surface);border-radius:50%;box-shadow:inset 0 0 0 1px var(--line);
+                    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">
+          {{ kpis.pct_concluido|unlocalize }}%
+        </div>
+      </div>
+      <ul style="list-style:none;margin:0;padding:0">
+        {% for s in concl_segments %}
+          <li style="margin-bottom:6px">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{{ s.color }};margin-right:8px"></span>
+            {{ s.label }} — <strong>{{ s.pct|unlocalize }}%</strong>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Projetos por Status</h3>
+    <div style="display:flex;gap:24px;align-items:center">
+      <div style="width:220px;height:220px;border-radius:50%;position:relative;
+                  background: conic-gradient(
+                    {% for s in status_segments %}
+                      {{ s.color }} {{ s.start|unlocalize }}% {{ s.end|unlocalize }}%{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  );">
+        <div style="position:absolute;inset:36px;background:var(--surface);border-radius:50%;box-shadow:inset 0 0 0 1px var(--line);"></div>
+      </div>
+      <ul style="list-style:none;margin:0;padding:0">
+        {% for s in status_segments %}
+          <li style="margin-bottom:6px">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{{ s.color }};margin-right:8px"></span>
+            {{ s.label|title }} — <strong>{{ s.pct|unlocalize }}%</strong> ({{ s.count }})
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:12px">
+  <div class="card">
+    <h3>% Concluído por Responsável</h3>
+    <div class="bars">
+      {% for r in por_resp %}
+        <div class="barwrap">
+          <div class="bar" style="height: {{ r.pct|unlocalize }}%"></div>
+          <div class="barlabel"><strong>{{ r.pct|unlocalize }}%</strong></div>
+          <div class="barfoot">{{ r.resp }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Área de Atuação</h3>
+    <table class="tbl">
+      <thead><tr><th>Área</th><th>Projetos</th><th>%</th><th>Andamento</th><th>Concluídos</th></tr></thead>
+      <tbody>
+        {% for a in por_area %}
+          <tr>
+            <td>{{ a.area }}</td>
+            <td>{{ a.total }}</td>
+            <td>{{ a.pct|unlocalize }}%</td>
+            <td>{{ a.anda }}</td>
+            <td>{{ a.concl }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
