@@ -1,0 +1,12 @@
+@media (min-width: 1280px){
+  .form-grid{
+    grid-template-columns:repeat(3,minmax(220px,1fr));
+  }
+}
+
+/* Diversos */
+.logout-inline{margin-left:12px;}
+.logout-inline .btn-link{padding:6px 10px;}
+.form-row{display:flex;gap:12px;align-items:center;}
+.form-row .grow{flex:1;}
+.form-help{margin-top:10px;}

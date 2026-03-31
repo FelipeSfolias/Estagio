@@ -1,0 +1,9 @@
+@import url("partials/00-tokens.css");
+@import url("partials/01-reset.css");
+@import url("partials/10-auth.css");
+@import url("partials/20-layout.css");
+@import url("partials/30-components.css");
+@import url("partials/40-indicadores.css");
+@import url("partials/50-kanban.css");
+@import url("partials/60-chat.css");
+@import url("partials/90-utilities.css");

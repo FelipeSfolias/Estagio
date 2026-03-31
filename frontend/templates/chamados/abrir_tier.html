@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Abrir Chamado{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2 style="margin:0 0 8px">Abrir Chamado</h2>
+  <p style="margin:0 0 16px;color:#64748b">Preencha os campos abaixo. Campos marcados com * são obrigatórios.</p>
+
+  <form method="post" enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+
+    <div class="form-grid">
+      <div class="fg">
+        <label for="id_assunto">Assunto *</label>
+        {{ form.assunto }}
+      </div>
+      {% load roles %}
+
+<div class="grid-col">
+  <label>Prioridade *</label>
+
+  {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'suporte' %}
+    {# Admin/Suporte escolhem a prioridade normalmente #}
+    <select name="prioridade" class="input">
+      <option value="alta"   {% if form.data.prioridade == "alta" %}selected{% endif %}>alta</option>
+      <option value="média"  {% if form.data.prioridade == "média" %}selected{% endif %}>média</option>
+      <option value="baixa"  {% if form.data.prioridade == "baixa" %}selected{% endif %}>baixa</option>
+      <option value="pendente" {% if form.data.prioridade == "pendente" %}selected{% endif %}>pendente</option>
+    </select>
+  {% else %}
+    {# Colaborador não escolhe prioridade #}
+    <div class="pill pill-muted">Definida pelo TI
+    </div>
+    <input type="hidden" name="prioridade" value="pendente">
+  {% endif %}
+</div>
+
+
+      <div class="fg">
+        <label for="id_origem">Origem *</label>
+        {{ form.origem }}
+      </div>
+      <div class="fg">
+        <label for="id_ativo_id">Ativo id (opcional)</label>
+        {{ form.ativo_id }}
+      </div>
+
+      <div class="fg" style="grid-column:1/-1">
+        <label for="id_descricao">Descrição *</label>
+        {{ form.descricao }}
+      </div>
+
+      <div class="fg">
+        <label for="id_anexo">Anexo (opcional)</label>
+        {{ form.anexo }}
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="submit">Abrir Chamado</button>
+      <a class="btn-link" href="{% url 'core:dashboard' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

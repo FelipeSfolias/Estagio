@@ -1,0 +1,49 @@
+/* ----- Pie/Donut (Indicadores) ----- */
+.pie-card .pie-wrap{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.pie-card .pie{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  position:relative;
+  background:#e5e7eb; /* substituído inline por conic-gradient */
+}
+.pie-card .pie::after{
+  content:"";
+  position:absolute;
+  inset:36px;
+  background:var(--surface);
+  border-radius:50%;
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.pie-card .pie-center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-weight:800;
+  font-size:18px;
+}
+.pie-card .legend{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(180px,1fr));
+  gap:10px 18px;
+}
+.pie-card .legend li{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.pie-card .legend .dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  display:inline-block;
+}

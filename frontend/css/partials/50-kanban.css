@@ -1,0 +1,473 @@
+/* --- Kanban --- */
+
+.kanban{
+  display:flex;
+  flex-direction:row;
+  gap:16px;
+  overflow-x:auto;
+  padding-bottom:12px;
+  align-items:flex-start;
+  /* scroll suave */
+  scroll-behavior:smooth;
+  /* mostrar scrollbar fina no webkit */
+ }
+.kanban::-webkit-scrollbar{height:6px;}
+.kanban::-webkit-scrollbar-track{background:transparent;}
+.kanban::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px;}
+
+.kcol{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  min-height:360px;
+  display:flex;
+  flex-direction:column;
+  /* largura fixa para permitir scroll lateral */
+  min-width:280px;
+  width:280px;
+  flex-shrink:0;
+}
+.kcol-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.kcol h3{
+  margin:0;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.kcol-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* Cards do Kanban */
+.kcard{
+  position:relative;
+  background:linear-gradient(135deg,#ffffff,#f9fafb);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px 12px;
+  box-shadow:0 10px 18px -14px rgba(15,23,42,.35);
+  cursor:grab;
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+.kcard:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 26px -18px rgba(15,23,42,.45);
+  border-color:#cbd5f5;
+}
+.kcard:active{
+  cursor:grabbing;
+  transform:scale(.99);
+}
+.kcard-header{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:4px;
+}
+.kcard-status{font-size:10px;}
+.kcard-title{
+  margin:0 0 6px;
+  font-size:14px;
+  font-weight:700;
+  color:#0f172a;
+}
+.kcard-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.kcard-avatar{
+  width:24px;
+  height:24px;
+  border-radius:999px;
+  background:#e5e7eb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+  color:#4b5563;
+}
+.kcard-meta-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  font-size:12px;
+}
+.kcard-meta-main{font-weight:600;}
+.kcard-meta-sub{color:var(--muted);}
+.kcard-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.kcard-progress{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.kcard-progress-track{
+  flex:1;
+  height:6px;
+  border-radius:999px;
+  background:#e5e7eb;
+  overflow:hidden;
+}
+.kcard-progress-bar{
+  height:100%;
+  width:var(--k-progress,0%);
+  background:#60a5fa;
+  border-radius:999px;
+}
+.kcard-progress-label{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* Cores dos cards */
+.kcard-color-blue{
+  border-left:4px solid #3b82f6;
+  box-shadow:0 12px 24px -18px rgba(37,99,235,.8);
+}
+.kcard-color-green{
+  border-left:4px solid #10b981;
+  box-shadow:0 12px 24px -18px rgba(5,150,105,.8);
+}
+.kcard-color-purple{
+  border-left:4px solid #8b5cf6;
+  box-shadow:0 12px 24px -18px rgba(124,58,237,.8);
+}
+.kcard-color-orange{
+  border-left:4px solid #f97316;
+  box-shadow:0 12px 24px -18px rgba(234,88,12,.8);
+}
+.kcard-color-gray{
+  border-left:4px solid #6b7280;
+  box-shadow:0 12px 24px -18px rgba(55,65,81,.8);
+}
+
+.kempty{
+  color:#94a3b8;
+  font-size:12px;
+  text-align:center;
+}
+
+/* Badges de status */
+.badge{
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+}
+.badge.status-em_andamento{background:#dbeafe;}
+.badge.status-nao_iniciado{background:#e5e7eb;}
+.badge.status-concluido{background:#dcfce7;}
+
+/* === Modal do Kanban: controle via classe .is-open === */
+
+@keyframes kBackdropIn{
+  from{opacity:0;}
+  to  {opacity:1;}
+}
+@keyframes kModalIn{
+  from{opacity:0;transform:translateY(12px) scale(.97);}
+  to  {opacity:1;transform:translateY(0)    scale(1);}
+}
+
+/* backdrop começa escondido */
+.kmodal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.5);
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.kmodal-backdrop.is-open{
+  display:flex;
+  animation:kBackdropIn .18s ease;
+}
+
+/* janela do modal (genérica) */
+.kmodal{
+  position:relative;
+  background:var(--surface);
+  border-radius:18px;
+  padding:20px 22px 18px;
+  width:min(520px,100%);
+  max-height:85vh;
+  overflow:auto;
+  box-shadow:0 24px 60px rgba(15,23,42,.45);
+  animation:kModalIn .22s cubic-bezier(.22,.68,0,1.2);
+}
+
+/* ---- Modal específico: Novo Quadro ---- */
+.kmodal-newcol{
+  width:min(420px,100%);
+  padding:0;
+  overflow:visible;
+}
+
+/* cabeçalho colorido do modal Novo Quadro */
+.kmodal-newcol-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:20px 22px 16px;
+  border-bottom:1px solid var(--line);
+}
+
+.kmodal-newcol-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  color:#fff;
+}
+.kmodal-newcol-icon svg{
+  width:20px;
+  height:20px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+}
+
+.kmodal-newcol-headtext{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.kmodal-newcol-title{
+  margin:0;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+}
+.kmodal-newcol-sub{
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* body do modal Novo Quadro */
+.kmodal-newcol-body{
+  padding:20px 22px;
+}
+
+.kmodal-newcol-label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:6px;
+}
+
+.kmodal-newcol-input{
+  width:100%;
+  background:var(--bg);
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:14px;
+  font-weight:500;
+  color:var(--text);
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+  box-sizing:border-box;
+}
+.kmodal-newcol-input:focus{
+  border-color:#94a3b8;
+  box-shadow:0 0 0 3px rgba(148,163,184,.18);
+}
+
+/* rodapé do modal Novo Quadro */
+.kmodal-newcol-footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  padding:14px 22px 18px;
+  border-top:1px solid var(--line);
+}
+
+/* botão ghost (Cancelar) */
+.btn-ghost{
+  background:transparent;
+  border:1.5px solid var(--line);
+  color:var(--text);
+  padding:8px 16px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .14s, border-color .14s;
+}
+.btn-ghost:hover{
+  background:var(--bg);
+  border-color:#94a3b8;
+}
+
+/* botão primário Criar */
+.btn-primary{
+  background:var(--text);
+  color:#fff;
+  border:0;
+  padding:8px 18px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:filter .14s, transform .12s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.btn-primary:hover{filter:brightness(1.15);}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary svg{
+  width:14px;
+  height:14px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.5;
+}
+
+.kmodal-title{
+  margin:0 0 10px;
+  font-size:16px;
+  font-weight:700;
+}
+.kmodal-close{
+  position:absolute;
+  top:10px;
+  right:12px;
+  border:0;
+  padding:0;
+  background:transparent;
+  font-size:20px;
+  cursor:pointer;
+  line-height:1;
+  color:var(--muted);
+}
+.kmodal-section{margin-bottom:12px;}
+.kmodal-label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.kmodal-help{
+  display:block;
+  margin-top:4px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.kmodal-color-options{
+  display:flex;
+  gap:8px;
+}
+.kcolor{
+  width:24px;
+  height:24px;
+  border-radius:999px;
+  border:2px solid transparent;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.kcolor-blue{background:#bfdbfe;}
+.kcolor-green{background:#bbf7d0;}
+.kcolor-purple{background:#ddd6fe;}
+.kcolor-orange{background:#fed7aa;}
+.kcolor-gray{background:#e5e7eb;}
+.kcolor.is-active{border-color:#0f172a;}
+
+.kmodal-checklist{
+  border:1px dashed var(--line);
+  border-radius:10px;
+  padding:8px;
+}
+.kmodal-checklist-list{
+  list-style:none;
+  margin:0 0 6px;
+  padding:0;
+  max-height:160px;
+  overflow:auto;
+}
+.kmodal-checklist-item{
+  font-size:12px;
+  margin-bottom:4px;
+}
+.kmodal-checklist-item label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.kmodal-checklist-add{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.kmodal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:8px;
+}
+
+/* Impede scroll do body com modal aberto */
+body.no-scroll{overflow:hidden;}
+
+/* Botão de adicionar novo quadro */
+.kcol-add{
+  min-width:200px;
+  width:200px;
+  flex-shrink:0;
+  border:2px dashed var(--line);
+  border-radius:16px;
+  background:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:120px;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:600;
+  transition:border-color .15s, color .15s, background .15s;
+  padding:16px;
+}
+.kcol-add:hover{
+  border-color:#94a3b8;
+  color:#475569;
+  background:rgba(148,163,184,.06);
+}
+.kcol-add-icon{
+  font-size:28px;
+  line-height:1;
+  font-weight:300;
+}

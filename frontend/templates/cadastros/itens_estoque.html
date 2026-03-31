@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Itens de Estoque{% endblock %}
+{% block content %}
+
+<style>
+  /* Ações como em Usuários */
+  .tbl td{ vertical-align: middle; }
+  .tbl-actions{
+    display:flex; justify-content:flex-end; align-items:center;
+    gap:10px; padding-right:8px; white-space:nowrap; text-align:right;
+    flex-direction: row; flex-wrap: nowrap;
+  }
+  .tbl-actions form.inline{ display: contents; }
+
+  .btn-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; line-height:0;
+    border:1px solid var(--line); border-radius:10px;
+    background:#fff; color:#0f172a; cursor:pointer;
+    transition:filter .15s, transform .06s, box-shadow .2s, background .2s, color .2s, border-color .2s;
+  }
+  .btn-icon svg{ display:block; }
+  .btn-icon:hover{ filter:brightness(.98); box-shadow:0 6px 16px rgba(2,6,23,.08); }
+  .btn-icon:active{ transform:translateY(1px); }
+
+  .btn-icon.edit{ color:#0f172a !important; background:#fff; border-color:var(--line); }
+  .btn-icon.edit:hover{ filter:brightness(.96); }
+
+  .btn-icon.danger{ background:#fff; border-color:var(--line); color:#0f172a; }
+  .btn-icon.danger:hover{ background:#fee2e2; border-color:#fecaca; color:#991b1b; }
+</style>
+
+<form method="post" class="form">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div class="fg"><label>SKU</label>{{ form.sku }}</div>
+    <div class="fg"><label>Nome</label>{{ form.nome }}</div>
+    <div class="fg"><label>Unidade</label>{{ form.unidade }}</div>
+    <div class="fg"><label>Nível Mínimo</label>{{ form.nivel_minimo }}</div>
+    <div class="fg"><label>Quantidade</label>{{ form.qtde }}</div>
+  </div>
+  <div class="actions"><button class="btn">Salvar (mock)</button></div>
+</form>
+
+<div class="table-actions">
+  <div class="left"><strong>Itens (mock)</strong></div>
+  <div class="right">
+    <form method="get" style="display:flex;gap:8px;align-items:center">
+      <select name="unidade" class="input-lite">
+        <option value="">Unidade</option>
+        {% for u in unidades %}
+          {% with ul=u|lower %}
+            <option value="{{ ul }}" {% if sel_unidade == ul %}selected{% endif %}>{{ u }}</option>
+          {% endwith %}
+        {% endfor %}
+      </select>
+
+      <select name="low" class="input-lite">
+        <option value="">Abaixo do mínimo?</option>
+        <option value="sim" {% if sel_low == 'sim' %}selected{% endif %}>Sim</option>
+      </select>
+
+      <input class="input-lite" type="number" name="id" value="{{ sel_id }}" placeholder="ID"/>
+      <input class="input-lite" type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar SKU ou nome"/>
+      <button class="btn">Filtrar</button>
+      <a class="btn-link" href="{% url 'core:cad_itens_estoque' %}">Limpar</a>
+    </form>
+  </div>
+</div>
+
+<table class="tbl">
+  <thead>
+    <tr>
+      <th>ID</th><th>SKU</th><th>Nome</th><th>Unid.</th><th>Nível Mín.</th><th>Qtd</th>
+      <th style="width:120px">Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in itens %}
+      <tr>
+        <td>{{ i.id }}</td>
+        <td>{{ i.sku }}</td>
+        <td>{{ i.nome }}</td>
+        <td>{{ i.unidade }}</td>
+        <td>{{ i.nivel_minimo }}</td>
+        <td>{{ i.qtde }}</td>
+        <td class="tbl-actions">
+          <a class="btn-icon edit" title="Editar" href="{% url 'core:item_editar' i.id %}">
+            <!-- lápis -->
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19H4v-3L16.5 3.5z"/><path d="M15.2 5.2l3.6 3.6"/>
+            </svg>
+          </a>
+          <form method="post" action="{% url 'core:item_excluir' i.id %}" class="inline">
+            {% csrf_token %}
+            <button class="btn-icon danger" title="Excluir" onclick="return confirm('Excluir item {{ i.nome }}?')">
+              <!-- lixeira -->
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <path d="M10 11v6M14 11v6"/>
+              </svg>
+            </button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7">Nenhum registro encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
